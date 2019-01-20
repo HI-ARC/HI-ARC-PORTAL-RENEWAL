@@ -4,7 +4,8 @@
 
 {% block main_content %}
 <form class="form-horizontal" action = "/signup" method = "POST">
-    <legend>가입 신청</legend>
+  <br/>  
+  <legend>가입 신청</legend>
     {% csrf_token %}
     {{ form|bootstrap_horizontal }}
     <div class="form-group">
