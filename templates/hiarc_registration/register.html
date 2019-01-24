@@ -1,18 +1,28 @@
-{% extends "base_generic.html" %}
+{% extends 'base_generic.html' %}
 
 {% load bootstrap %}
+{% load i18n %}
+
 
 {% block main_content %}
-<form class="form-horizontal" action = "/signup" method = "POST">
-  <br/>  
-  <legend>가입 신청</legend>
-    {% csrf_token %}
-    {{ form|bootstrap_horizontal }}
-    <div class="form-group">
-        <div class="col-sm-10 col-sm-offset-2">
-            <button type="submit" class="btn btn-primary">회원가입을 신청합니다.</button>
-        </div>
-    </div>
-</form>
-
+<form action="" method="post">
+  {% csrf_token %}
+  <table>
+    {{ wizard.management_form }}    
+    {% if wizard.form.forms %}
+      {{ wizard.form.management_form }}      
+      {% for form in wizard.form.forms %}
+        {{ form }}
+      {% endfor %}
+    {% else %}
+      {{ wizard.form }}              
+    {% endif %}      
+  </table>
+  
+  {% if wizard.steps.prev %}
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+  {% endif %}
+  <input type="submit" value="{% trans 'submit' %}" />    
+</form>  
 {% endblock %}
