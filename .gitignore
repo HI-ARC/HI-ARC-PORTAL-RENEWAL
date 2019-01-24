@@ -1,1 +1,5 @@
 *.pyc
+.vscode
+.ipynb_checkpoints/
+*.ipynb
+*.sqlite3

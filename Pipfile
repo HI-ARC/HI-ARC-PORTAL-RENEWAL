@@ -11,5 +11,5 @@ django-taggit = "*"
 
 [dev-packages]
 
-[requires]p
+[requires]
 python_version = "3.7"

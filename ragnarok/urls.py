@@ -48,9 +48,9 @@ urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 
-from hiarc_registration.views import register_user
-
+from hiarc_registration.views import SignupWizard
+from hiarc_registration.forms import HiarcUserCreationForm1, HiarcUserCreationForm2, HiarcUserCreationForm3
 #Add Django site registration urls (for sign up)
 urlpatterns += [
-    path('signup', register_user )
+    path('signup/', SignupWizard.as_view([HiarcUserCreationForm1, HiarcUserCreationForm2, HiarcUserCreationForm3]) )
 ]

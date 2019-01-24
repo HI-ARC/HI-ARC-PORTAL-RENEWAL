@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser,
+    BaseUserManager, UserManager, AbstractBaseUser,
     PermissionsMixin, Group)
 
 STATUSES = (
@@ -35,20 +35,38 @@ MAJORS = (
 # 커스텀 유저를 다루기 위한 UserManager 클래스를 재정의
 class HiarcUserManager(BaseUserManager):
 
-    def create_user(self, email, username, password=None):
+    use_in_migrations = True
+
+    def create_user(self, email, username, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
-
+        
         user = self.model(
-            email=HiarcUserManager.normalize_email(email),
-            username=username,
-        )
-
+            email=HiarcUserManager.normalize_email(email),            
+            username=username)          
+        
+        user.is_paid = False
         user.is_active = False
         user.is_staff = False
         user.set_password(password)
 
+        user.real_name = extra_fields["real_name"]
+        user.student_id = extra_fields["student_id"]
+        user.phone_number = extra_fields["phone_number"]
+        user.status = extra_fields["status"]
+        user.semester = extra_fields["semester"]
+        user.major = extra_fields["major"]
+        user.minor = extra_fields["minor"]
+        user.motivation = extra_fields["motivation"]
+        user.portfolio = extra_fields["portfolio"]
+        user.comment = extra_fields["comment"]
+        user.codeforces_id = extra_fields["codeforces_id"]
+        user.boj_id = extra_fields["boj_id"]
+        user.github_id = extra_fields["github_id"]
+        user.blog_url = extra_fields["blog_url"]  
+        
         user.save(using=self._db)
+        
 
         return user
 
@@ -137,7 +155,7 @@ class HiarcUser(AbstractBaseUser,  PermissionsMixin):
         default='1'
     )
 
-    major   = models.CharField(
+    major = models.CharField(
         verbose_name='major',
         choices=MAJORS,
         max_length=2,
@@ -159,6 +177,20 @@ class HiarcUser(AbstractBaseUser,  PermissionsMixin):
     portfolio = models.TextField( 
         verbose_name='portfolio'
     )
+
+    comment = models.TextField(
+        verbose_name ='comment'
+    )
+
+    codeforces_id = models.CharField(verbose_name='codeforces_id', max_length=20, blank=True)
+
+    boj_id = models.CharField(verbose_name='boj_id', max_length=20, blank=True)
+
+    topcoder_id = models.CharField(verbose_name='topcoder_id', max_length=20, blank=True)
+    
+    github_id = models.CharField(verbose_name='github_id', max_length=20, blank=True)
+
+    blog_url = models.CharField(verbose_name='blog_url', max_length=20, blank=True)
 
     is_paid   = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

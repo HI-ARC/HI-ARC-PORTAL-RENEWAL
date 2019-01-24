@@ -1,15 +1,22 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, User
+from django.contrib.auth import password_validation
 from .models import HiarcUser, STATUSES, MAJORS, SEMESTERS
 
 import json
 # import request
 
-class HiarcUserCreationForm1(UserCreationForm):
+class HiarcUserCreationForm1(forms.Form):
     
     # 1
     email = forms.EmailField(required=True)
-    real_name = forms.CharField(required=True, max_length=20)
+    real_name = forms.CharField(required=True, max_length=20, help_text='실제 이름을 입력해주세요')
+    username = forms.CharField(required=True, max_length=20, help_text='user로 등록할 이름을 입력해주세요')    
+    password = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput        
+    )    
     student_id = forms.CharField(required=True, max_length=7) # validator
     phone_number = forms.CharField(required=True, max_length=20)
     status = forms.CharField(required=True, widget=forms.Select(choices=STATUSES))
@@ -22,19 +29,21 @@ class HiarcUserCreationForm1(UserCreationForm):
 
     class Meta:
         model = HiarcUser
-        fields = ("email", "real_name", "student_id", "phone_number", "status", "semester", "major", "minor")
+        fields = ("email", "real_name", "username", "student_id", "phone_number", "status", "semester", "major", "minor")
 
     def save(self, commit=True):
         user = super(HiarcUserCreationForm1, self).save(commit=False)
 
         user.email = self.cleaned_data["email"]
-        user.real_name = self.cleaned_data["real_name"]
+        first_name, last_name = self.cleaned_data["username"].split()
+        user.first_name = first_name
+        user.last_name = last_name             
         user.student_id = self.cleaned_data["student_id"]
         user.phone_number = self.cleaned_data["phone_number"]
         user.status = self.cleaned_data["status"]
         user.semester = self.cleaned_data["semester"]        
         user.major = self.cleaned_data["major"]
-        user.minor = self._clean_fields["minor"]
+        user.minor = self.cleaned_data["minor"]
         '''
         webhook_url = system.environment['SLACK_WEBHOOK_URL']
         message = "회원가입 신청이 들어왔습니다. \n이름 : {}\n 이메일 : {} \n학과/학번/학년 : {}\n 자세한 사항은 관리자페이지에서 확인해보세요.".format(user.real_name, user.email, user.status)
@@ -44,13 +53,13 @@ class HiarcUserCreationForm1(UserCreationForm):
             webhook_url, data=json.dumps(slack_data),
             headers={'Content-Type': 'application/json'}
         )
-        '''
+        # '''
 
-        if commit:
-            user.save()
-        return user
+        # if commit:
+        #     user.save()
+        # return user
 
-class HiarcUserCreationForm2(UserCreationForm):
+class HiarcUserCreationForm2(forms.Form):
 
     # 2 
     motivation = forms.CharField(required=True, widget=forms.Textarea)
@@ -79,22 +88,22 @@ class HiarcUserCreationForm2(UserCreationForm):
         )
         '''
 
-        if commit:
-            user.save()
-        return user
+        # if commit:
+        #     user.save()
+        # return user
 
-class HiarcUserCreationForm3(UserCreationForm):
+class HiarcUserCreationForm3(forms.Form):
 
     # 3
     codeforces_id = forms.CharField(required=False, widget=forms.Textarea)
     boj_id = forms.CharField(required=False, widget=forms.Textarea)
     topcoder_id = forms.CharField(required=False, widget=forms.Textarea)
-    githup_id = forms.CharField(required=False, widget=forms.Textarea)
+    github_id = forms.CharField(required=False, widget=forms.Textarea)
     blog_url = forms.CharField(required=False, widget=forms.Textarea)
 
     class Meta:
         model = HiarcUser
-        fields = ("codeforces_id", "boj_id", "topcoder_id", "githup_id", "blog_url")
+        fields = ("codeforces_id", "boj_id", "topcoder_id", "github_id", "blog_url")
 
     def save(self, commit=True):
         user = super(HiarcUserCreationForm3, self).save(commit=False)
@@ -102,9 +111,9 @@ class HiarcUserCreationForm3(UserCreationForm):
         user.codeforces_id = self.cleaned_data["coedforces_id"]
         user.boj_id = self.cleaned_data["boj_id"]
         user.topcoder_id = self.cleaned_data["topcoder_id"]
-        user.gihub_id = self.cleaned_data["github.id"]
-        user.blog_url = self.cleaned_data["blog.url"]
+        user.gihub_id = self.cleaned_data["github_id"]
+        user.blog_url = self.cleaned_data["blog_url"]
             
-        if commit:
-            user.save()
-            return user
+        # if commit:
+        #     user.save()
+        #     return user

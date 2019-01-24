@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     "bootstrapform",
     'import_export',
+    'formtools',
     
     #Add our new application 
     'hiarc_registration.apps.HiarcRegistrationConfig',
@@ -156,3 +157,19 @@ STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = "hiarc_registration.HiarcUser"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+        },
+    },
+}
