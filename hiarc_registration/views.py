@@ -1,21 +1,26 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect
+from formtools.wizard.views import SessionWizardView
+from django.contrib.auth.forms import User
 from django.views.decorators.csrf import csrf_protect
+from .forms import HiarcUserCreationForm1, HiarcUserCreationForm2, HiarcUserCreationForm3
+from .models import HiarcUser
 
+class SignupWizard(SessionWizardView):
+    
+    template_name = 'hiarc_registration/register.html'
+    form_list = [HiarcUserCreationForm1, HiarcUserCreationForm2, HiarcUserCreationForm3]
+   
+    def done(self, form_list, **kwargs):        
+        if self.request.method == 'POST':            
+            
+            data = {}
+            for form in form_list:
+                data.update(form.cleaned_data)  
 
-from hiarc_registration.forms import HiarcUserCreationForm
-# Create your views here.
-
-@csrf_protect
-def register_user(request):
-    if request.method == 'POST':
-        form = HiarcUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/')
-
-    args = {}
-
-    args['form'] = HiarcUserCreationForm()
-
-    return render(request,'hiarc_registration/register.html', args)
+            user = HiarcUser.objects.create_user(**data)   
+                 
+        return render(self.request, 'hiarc_registration/done.html', {
+            'form_data' : [form.cleaned_data for form in form_list],
+        })
+        
+    
